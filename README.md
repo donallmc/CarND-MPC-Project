@@ -1,6 +1,65 @@
 # CarND-Controls-MPC
 Self-Driving Car Engineer Nanodegree Program
 
+##Rubric Points
+
+The general goal of this project is to produce a Model Predictive Control program that is capable of driving
+a virtual car around the Udacity self-driving car simulator. The car should complete a full lap without its
+tyres leaving the driveable portion of the track or perform any manoeuvre that would be considered "unsafe"
+by any humans in the vehicle.
+
+###The Model
+The project employs a kinematic model which is a simplified representation of a car on a road, ignoring
+complex features such as the interaction between the tyres and the road, drift, etc.
+
+The model state is defined as ```[x, y, psi, v, cte, psi]``` where
+- `x` and `y` correspond to the vehicle's position;
+- `psi` is the vehicle's heading;
+- `v` is the vehicle's velocity;
+- `cte` is the vehicle's crosstrack error; and
+- `epsi` is the vehicle's heading error.
+
+These values are computable by the following set of equations, as provided in the course materials:
+```
+(1) x_[t+1] = x[t] + v[t] * cos(psi[t]) * dt
+(2) y_[t+1] = y[t] + v[t] * sin(psi[t]) * dt
+(3) psi_[t+1] = psi[t] + v[t] / Lf * delta[t] * dt
+(4) v_[t+1] = v[t] + a[t] * dt
+(5) cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
+(6) epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt 
+```
+where:
+- `t` represents a timestamp; 'dt' corresponds to the elapsed time; and
+- Lf is a constant representing the distance between a car's centre of mass and its front wheels
+
+The model outputs two actuators, `a` (throttle) and `delta` (steering angle) which are then used to drive the simulator.
+
+###Cost Minimization
+I used the standard cost function as provided in the quiz code, which sought to minimize the crosstrack error, heading error
+and velocity delta, as well as penalizing actuator use and large changes between consecutive actuator uses.
+
+Through trial and error, I discovered that applying a significant weight to the sequential actuations cost was the most
+important tweak as it corrected wild over-steering in the model. I also applied a mild weight to the actuator use function
+which was useful to modulate acceleration.
+
+###Target Velocity
+I initially set the target velocity to 40 but as I refined the model I experimented with pushing the velocity higher.
+Through tweaking the cost function weighting, I settled on a target velocity of 80, although the simulator doesn't achieve it.
+The fastest speed I could safely produce was around 65.
+
+###Timestep Length and Elapsed Duration (N & dt)
+The timestep and elapsed duration were initially set to the values provided in the sample code (25 and 0.05 respectively).
+With some experimentation, it became apparent that 25 was an excessively large number and it caused failures in parts of
+the track that involved multiple turns within a relatively short distance. I speculate that looking too far into the future
+produced a line that couldn't be well-modelled by a 3rd-degree polynomial and this had a detrimental effect on accuracy.
+Reducing the value of `N` to 1 produced even worse results so I set it to 15 and found that the model performed well in
+the simulator. I kept the value of 0.05 for `dt` as I was already getting adequate performance and increasing it significantly
+would likely result in problems due to latency.
+
+
+###Latency
+Latency is simulated by having the thread sleep for 100ms between computing values and sending them to the server.
+
 ---
 
 ## Dependencies
