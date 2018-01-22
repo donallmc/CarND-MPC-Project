@@ -63,6 +63,9 @@ would likely result in problems due to latency.
 ### Latency
 Latency is simulated by having the thread sleep for 100ms between computing values and sending them to the server.
 
+The code handles latency by projecting the model 100ms into the future based on the current state
+of the vehicle (heading, velocity, etc) and returning the appropriate actuator values to the server.
+
 ---
 
 ## Dependencies

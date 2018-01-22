@@ -12,6 +12,8 @@
 // for convenience
 using json = nlohmann::json;
 
+const double Lf = 2.67;
+
 // For converting back and forth between radians and degrees.
 constexpr double pi() { return M_PI; }
 double deg2rad(double x) { return x * pi() / 180; }
@@ -107,11 +109,25 @@ int main() {
 	  }
 
 	  auto coeffs = polyfit(xvals, yvals, 3);
-	  double cte = -polyeval(coeffs, 0) ; //at 0,0
+	  double cte = polyeval(coeffs, 0); //at 0,0
 	  double epsi = -atan(coeffs[1]);
 
+	  //latency handling code based on project feeback
+	  double latency = 0.1;
+          double a = (j[1]["throttle"]);
+	  double delta = (j[1]["steering_angle"]);
+	  delta *= deg2rad(25);
+	  delta *= -1;
+	  px = v * latency ;
+	  py =  0;
+	  psi = 0 + ( v * delta * latency / Lf );
+	  v = v + a * latency;
+	  cte = cte + ( v * sin(epsi) * latency );
+	  epsi = epsi - ( v * atan(coeffs[1]) * latency / Lf );
+	  
+	  // Define the state vector.
 	  Eigen::VectorXd state(6);
-	  state << 0, 0, 0, v, cte, epsi;
+	  state << px, py, psi, v, cte, epsi;
 	  std::vector<double> vars = mpc.Solve(state, coeffs);
 
 	  double steer_value = vars[0]/ deg2rad(25) * -1;
