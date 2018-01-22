@@ -47,7 +47,7 @@ I initially set the target velocity to 40 but as I refined the model I experimen
 Through tweaking the cost function weighting, I experimented with a target velocity of 80; after the cost function waiting
 this effectively resulted in a speed of around 65, but this produced a couple of "questionable" turns,
 during which the car didn't leave the road but certainly would have caused any human passengers to be nervous! The submitted
-code has a target velocity of 50, resulting in a fairly consistent speed of 40, which is a little modest but which produces
+code has a target velocity of 60, resulting in a fairly consistent speed of around 40, which is a little modest but which produces
 a perfectly safe lap around the track.
 
 ### Timestep Length and Elapsed Duration (N & dt)

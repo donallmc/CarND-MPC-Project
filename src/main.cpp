@@ -93,6 +93,8 @@ int main() {
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
+	  //convert to m/s
+	  v*=0.44704;
 
 	  //This part of the code partially inspired by jeffersonh44's sample code in the forums https://discussions.udacity.com/t/stuck-moving-in-circles/272063/28
 	  // and by Nick Hortovanyi's write-up at https://medium.com/@NickHortovanyi/carnd-controls-mpc-2f456ce658f
@@ -123,7 +125,7 @@ int main() {
 	  psi = 0 + ( v * delta * latency / Lf );
 	  v = v + a * latency;
 	  cte = cte + ( v * sin(epsi) * latency );
-	  epsi = epsi - ( v * atan(coeffs[1]) * latency / Lf );
+	  epsi = epsi + ( v * delta * latency / Lf );
 	  
 	  // Define the state vector.
 	  Eigen::VectorXd state(6);
